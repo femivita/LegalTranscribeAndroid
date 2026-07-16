@@ -1,0 +1,25 @@
+# Gradle
+.gradle/
+build/
+*.gradle
+
+# Kotlin
+.kotlin/
+
+# Android
+local.properties
+*.apk
+*.aab
+*.keystore
+*.jks
+
+# iOS
+*.xcuserdata
+DerivedData/
+iosApp/LegalTranscriber.xcodeproj/project.xcworkspace/xcuserdata/
+iosApp/LegalTranscriber.xcodeproj/xcuserdata/
+
+# IDE
+.idea/
+*.iml
+.DS_Store
