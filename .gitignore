@@ -23,3 +23,10 @@ iosApp/LegalTranscriber.xcodeproj/xcuserdata/
 .idea/
 *.iml
 .DS_Store
+
+# Sensitive
+KEYSTORE_INFO.md
+app/google-services.json
+*.hprof
+
+# Gradle wrapper jar is fine to keep
