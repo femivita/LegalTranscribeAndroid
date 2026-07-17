@@ -4,7 +4,6 @@ plugins {
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.composeMultiplatform)
-    alias(libs.plugins.googleServices)
 }
 
 kotlin {
@@ -32,10 +31,6 @@ kotlin {
             implementation(libs.androidx.lifecycle.viewmodel.compose)
             implementation(libs.androidx.lifecycle.runtime.compose)
             implementation(libs.androidx.navigation.compose)
-            implementation("com.google.firebase:firebase-bom:33.5.1")
-            implementation("com.google.firebase:firebase-storage-ktx:21.0.1")
-            implementation("com.google.firebase:firebase-firestore-ktx:25.1.1")
-            implementation("com.google.firebase:firebase-auth-ktx:23.1.0")
             implementation("androidx.datastore:datastore-preferences:1.1.1")
         }
     }

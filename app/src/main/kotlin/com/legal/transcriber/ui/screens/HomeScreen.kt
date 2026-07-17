@@ -34,6 +34,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -55,6 +56,9 @@ import com.legal.transcriber.ui.theme.MutedInk
 import com.legal.transcriber.ui.theme.Navy
 import com.legal.transcriber.ui.theme.Separator
 import com.legal.transcriber.ui.theme.White
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -66,16 +70,21 @@ fun HomeScreen(
     val context = LocalContext.current
     val state by viewModel.transcriptionState.collectAsState()
     var hasNavigated by rememberSaveable { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
 
     val filePicker = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         if (uri != null) {
             val fileName = uri.lastPathSegment ?: viewModel.defaultFileName()
-            val bytes = context.contentResolver.openInputStream(uri)?.use { it.readBytes() }
-            if (bytes != null) {
-                hasNavigated = false
-                viewModel.transcribe(bytes, fileName)
+            hasNavigated = false
+            scope.launch {
+                val bytes = withContext(Dispatchers.IO) {
+                    context.contentResolver.openInputStream(uri)?.use { it.readBytes() }
+                }
+                if (bytes != null) {
+                    viewModel.transcribe(bytes, fileName)
+                }
             }
         }
     }

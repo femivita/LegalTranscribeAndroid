@@ -33,9 +33,8 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.preferencesDataStore
 import com.legal.transcriber.shared.SharedFactory
-import com.legal.transcriber.shared.auth.AndroidAuthService
+import com.legal.transcriber.shared.auth.AndroidTokenStorage
 import com.legal.transcriber.shared.auth.AuthState
-import com.legal.transcriber.shared.storage.AndroidStorageService
 import com.legal.transcriber.ui.navigation.MainTabView
 import com.legal.transcriber.ui.screens.AuthScreen
 import com.legal.transcriber.ui.screens.OnboardingScreen
@@ -52,11 +51,10 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val authService = AndroidAuthService()
-        val viewModel = SharedFactory.createViewModel(
-            storageService = AndroidStorageService(),
-            authService = authService,
-        )
+        val tokenStorage = AndroidTokenStorage(applicationContext)
+        val components = SharedFactory.create(tokenStorage = tokenStorage)
+        val viewModel = components.viewModel
+        val authService = components.authService
 
         val hasCompletedOnboarding = runBlocking {
             applicationContext.dataStore.data.first()[booleanPreferencesKey("onboarding_completed")] ?: false

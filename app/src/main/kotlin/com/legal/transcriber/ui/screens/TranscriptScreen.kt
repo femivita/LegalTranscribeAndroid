@@ -151,10 +151,10 @@ fun TranscriptScreen(
                             modifier = Modifier.padding(end = 16.dp).size(22.dp),
                         )
                     } else {
-                        IconButton(onClick = {
+                        TextButton(onClick = {
                             viewModel.saveToHistory(title, fileName, segments)
                         }) {
-                            Icon(Icons.Rounded.CloudUpload, contentDescription = "Save", tint = Gold)
+                            Text("Save", fontFamily = FontFamily.Default, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = Gold)
                         }
                     }
                 },

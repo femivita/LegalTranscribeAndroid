@@ -675,11 +675,31 @@ private fun stripMarkdown(raw: String): String {
 
 private fun formatChatTime(isoString: String): String {
     return try {
-        val instant = java.time.Instant.parse(isoString)
-        val localTime = instant.toString().substring(11, 16)
-        localTime
+        val normalized = if (isoString.endsWith("Z") || isoString.contains("+")) isoString else "${isoString}Z"
+        val instant = java.time.Instant.parse(normalized)
+        val raw = instant.toString()
+        val year = raw.substring(0, 4)
+        val month = raw.substring(5, 7)
+        val day = raw.substring(8, 10)
+        val time = raw.substring(11, 16)
+        val monthName = when (month) {
+            "01" -> "Jan"
+            "02" -> "Feb"
+            "03" -> "Mar"
+            "04" -> "Apr"
+            "05" -> "May"
+            "06" -> "Jun"
+            "07" -> "Jul"
+            "08" -> "Aug"
+            "09" -> "Sep"
+            "10" -> "Oct"
+            "11" -> "Nov"
+            "12" -> "Dec"
+            else -> month
+        }
+        "$day $monthName $year, $time"
     } catch (_: Exception) {
-        ""
+        isoString
     }
 }
 
