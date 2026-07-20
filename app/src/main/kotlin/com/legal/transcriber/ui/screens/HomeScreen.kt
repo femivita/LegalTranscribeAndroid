@@ -49,6 +49,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.legal.transcriber.shared.viewmodel.TranscriptionState
 import com.legal.transcriber.shared.viewmodel.TranscriptionViewModel
+import com.legal.transcriber.shared.viewmodel.UsageInfo
+import com.legal.transcriber.subscription.SubscriptionManager
 import com.legal.transcriber.ui.theme.CardWhite
 import com.legal.transcriber.ui.theme.Cream
 import com.legal.transcriber.ui.theme.Gold
@@ -66,9 +68,12 @@ fun HomeScreen(
     viewModel: TranscriptionViewModel,
     onNavigateToHistory: () -> Unit,
     onTranscriptionComplete: (fileName: String) -> Unit,
+    onShowPaywall: () -> Unit,
 ) {
     val context = LocalContext.current
     val state by viewModel.transcriptionState.collectAsState()
+    val usageInfo by viewModel.usageInfo.collectAsState()
+    val isPro by SubscriptionManager.isPro.collectAsState()
     var hasNavigated by rememberSaveable { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
 
@@ -76,6 +81,11 @@ fun HomeScreen(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         if (uri != null) {
+            val canTranscribe = isPro || usageInfo.remaining > 0
+            if (!canTranscribe) {
+                onShowPaywall()
+                return@rememberLauncherForActivityResult
+            }
             val fileName = uri.lastPathSegment ?: viewModel.defaultFileName()
             hasNavigated = false
             scope.launch {

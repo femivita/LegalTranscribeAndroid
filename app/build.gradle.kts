@@ -32,6 +32,7 @@ kotlin {
             implementation(libs.androidx.lifecycle.runtime.compose)
             implementation(libs.androidx.navigation.compose)
             implementation("androidx.datastore:datastore-preferences:1.1.1")
+            implementation("com.revenuecat.purchases:purchases:8.14.0")
         }
     }
 }

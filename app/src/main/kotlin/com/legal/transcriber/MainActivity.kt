@@ -35,6 +35,7 @@ import androidx.datastore.preferences.preferencesDataStore
 import com.legal.transcriber.shared.SharedFactory
 import com.legal.transcriber.shared.auth.AndroidTokenStorage
 import com.legal.transcriber.shared.auth.AuthState
+import com.legal.transcriber.subscription.SubscriptionManager
 import com.legal.transcriber.ui.navigation.MainTabView
 import com.legal.transcriber.ui.screens.AuthScreen
 import com.legal.transcriber.ui.screens.OnboardingScreen
@@ -55,6 +56,9 @@ class MainActivity : ComponentActivity() {
         val components = SharedFactory.create(tokenStorage = tokenStorage)
         val viewModel = components.viewModel
         val authService = components.authService
+
+        SubscriptionManager.configure(application = application, viewModel = viewModel)
+        SubscriptionManager.setActivity(this)
 
         val hasCompletedOnboarding = runBlocking {
             applicationContext.dataStore.data.first()[booleanPreferencesKey("onboarding_completed")] ?: false

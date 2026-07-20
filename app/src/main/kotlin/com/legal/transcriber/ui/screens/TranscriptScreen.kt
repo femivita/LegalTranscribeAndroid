@@ -66,6 +66,7 @@ import com.legal.transcriber.shared.viewmodel.AnalysisState
 import com.legal.transcriber.shared.viewmodel.ExportState
 import com.legal.transcriber.shared.viewmodel.SaveState
 import com.legal.transcriber.shared.viewmodel.TranscriptionViewModel
+import com.legal.transcriber.subscription.SubscriptionManager
 import com.legal.transcriber.ui.theme.Cream
 import com.legal.transcriber.ui.theme.Gold
 import com.legal.transcriber.ui.theme.Ink
@@ -82,11 +83,13 @@ fun TranscriptScreen(
     viewModel: TranscriptionViewModel,
     fileName: String,
     onBack: () -> Unit,
+    onShowPaywall: () -> Unit,
 ) {
     val context = LocalContext.current
     val exportState by viewModel.exportState.collectAsState()
     val saveState by viewModel.saveState.collectAsState()
     val analysisState by viewModel.analysisState.collectAsState()
+    val isPro by SubscriptionManager.isPro.collectAsState()
 
     val segments = viewModel.segments
     var title by remember { mutableStateOf(viewModel.derivedTitle()) }
@@ -193,7 +196,9 @@ fun TranscriptScreen(
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         OutlinedButton(
-                            onClick = { viewModel.exportToDocx(title, segments) },
+                            onClick = {
+                                if (isPro) viewModel.exportToDocx(title, segments) else onShowPaywall()
+                            },
                             enabled = exportState !is ExportState.Loading,
                             modifier = Modifier.weight(1f),
                             shape = RoundedCornerShape(10.dp),
@@ -205,7 +210,9 @@ fun TranscriptScreen(
                             Text("DOCX", fontFamily = FontFamily.Default, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
                         }
                         OutlinedButton(
-                            onClick = { viewModel.exportToPdf(title, segments) },
+                            onClick = {
+                                if (isPro) viewModel.exportToPdf(title, segments) else onShowPaywall()
+                            },
                             enabled = exportState !is ExportState.Loading,
                             modifier = Modifier.weight(1f),
                             shape = RoundedCornerShape(10.dp),
@@ -217,7 +224,9 @@ fun TranscriptScreen(
                             Text("PDF", fontFamily = FontFamily.Default, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
                         }
                         Button(
-                            onClick = { viewModel.analyze(title, segments) },
+                            onClick = {
+                                if (isPro) viewModel.analyze(title, segments) else onShowPaywall()
+                            },
                             enabled = segments.isNotEmpty() && analysisState !is AnalysisState.Loading,
                             modifier = Modifier.weight(1f),
                             shape = RoundedCornerShape(10.dp),

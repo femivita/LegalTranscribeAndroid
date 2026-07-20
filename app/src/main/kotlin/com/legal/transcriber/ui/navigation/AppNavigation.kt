@@ -32,6 +32,7 @@ import com.legal.transcriber.ui.screens.ChatConversationScreen
 import com.legal.transcriber.ui.screens.ChatScreen
 import com.legal.transcriber.ui.screens.HistoryScreen
 import com.legal.transcriber.ui.screens.HomeScreen
+import com.legal.transcriber.ui.screens.PaywallScreen
 import com.legal.transcriber.ui.screens.ProfileScreen
 import com.legal.transcriber.ui.screens.TranscriptScreen
 import com.legal.transcriber.ui.theme.CardWhite
@@ -48,6 +49,7 @@ object Routes {
     const val CHAT = "chat"
     const val CHAT_CONVERSATION = "chat_conversation"
     const val PROFILE = "profile"
+    const val PAYWALL = "paywall"
 }
 
 @Composable
@@ -60,6 +62,8 @@ fun MainTabView(
     val currentRoute = backStackEntry?.destination?.route
 
     val showBottomBar = currentRoute in listOf(Routes.HOME, Routes.HISTORY, Routes.CHAT, Routes.PROFILE)
+
+    val showPaywall: () -> Unit = { navController.navigate(Routes.PAYWALL) }
 
     Scaffold(
         containerColor = Cream,
@@ -95,6 +99,7 @@ fun MainTabView(
                             launchSingleTop = true
                         }
                     },
+                    onShowPaywall = showPaywall,
                 )
             }
             composable(Routes.HISTORY) {
@@ -124,6 +129,7 @@ fun MainTabView(
                 ProfileScreen(
                     viewModel = viewModel,
                     authService = authService,
+                    onShowPaywall = showPaywall,
                 )
             }
             composable("${Routes.TRANSCRIPT}/{fileName}") { backStackEntry ->
@@ -135,6 +141,12 @@ fun MainTabView(
                         viewModel.resetTranscriptionState()
                         navController.popBackStack()
                     },
+                    onShowPaywall = showPaywall,
+                )
+            }
+            composable(Routes.PAYWALL) {
+                PaywallScreen(
+                    onDismiss = { navController.popBackStack() },
                 )
             }
         }

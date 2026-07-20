@@ -19,6 +19,7 @@ import androidx.compose.material.icons.rounded.Description
 import androidx.compose.material.icons.rounded.Logout
 import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material.icons.rounded.Schedule
+import androidx.compose.material.icons.rounded.WorkspacePremium
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -47,6 +48,7 @@ import com.legal.transcriber.shared.auth.AuthService
 import com.legal.transcriber.shared.auth.AuthState
 import com.legal.transcriber.shared.viewmodel.HistoryState
 import com.legal.transcriber.shared.viewmodel.TranscriptionViewModel
+import com.legal.transcriber.subscription.SubscriptionManager
 import com.legal.transcriber.ui.theme.Cream
 import com.legal.transcriber.ui.theme.Gold
 import com.legal.transcriber.ui.theme.MutedInk
@@ -59,9 +61,11 @@ import com.legal.transcriber.ui.theme.White
 fun ProfileScreen(
     viewModel: TranscriptionViewModel,
     authService: AuthService,
+    onShowPaywall: () -> Unit,
 ) {
     val authState by viewModel.authState.collectAsState()
     val historyState by viewModel.historyState.collectAsState()
+    val isPro by SubscriptionManager.isPro.collectAsState()
     var showSignOutDialog by remember { mutableStateOf(false) }
 
     Scaffold(
@@ -153,6 +157,33 @@ fun ProfileScreen(
                             fontSize = 16.sp,
                             color = Navy,
                         )
+                    }
+                }
+
+                androidx.compose.material3.Divider(color = Separator, thickness = 0.5.dp)
+
+                ProfileRow(
+                    icon = Icons.Rounded.WorkspacePremium,
+                    title = "Subscription",
+                ) {
+                    if (isPro) {
+                        Text(
+                            "Pro",
+                            fontFamily = FontFamily.Default,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Gold,
+                        )
+                    } else {
+                        TextButton(onClick = onShowPaywall) {
+                            Text(
+                                "Upgrade",
+                                fontFamily = FontFamily.Default,
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                color = Gold,
+                            )
+                        }
                     }
                 }
 
