@@ -36,11 +36,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -59,6 +61,8 @@ import com.legal.transcriber.ui.theme.MutedInk
 import com.legal.transcriber.ui.theme.Navy
 import com.legal.transcriber.ui.theme.Separator
 import com.legal.transcriber.ui.theme.White
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 import java.io.File
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -69,6 +73,8 @@ fun HistoryScreen(
 ) {
     val context = LocalContext.current
     val historyState by viewModel.historyState.collectAsState()
+    val hasMore by viewModel.hasMoreHistory.collectAsState()
+    val isLoadingMore by viewModel.isLoadingMoreHistory.collectAsState()
     var deleteTarget by remember { mutableStateOf<TranscriptHistory?>(null) }
 
     val listState = rememberSaveable(saver = androidx.compose.foundation.lazy.LazyListState.Saver) {
@@ -151,6 +157,34 @@ fun HistoryScreen(
                                     },
                                     onDelete = { deleteTarget = item },
                                 )
+                            }
+                            if (hasMore) {
+                                item {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(16.dp),
+                                        contentAlignment = Alignment.Center,
+                                    ) {
+                                        CircularProgressIndicator(
+                                            color = Gold,
+                                            modifier = Modifier.size(28.dp),
+                                        )
+                                    }
+                                }
+                            }
+                        }
+
+                        LaunchedEffect(listState) {
+                            snapshotFlow {
+                                val lastVisible = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
+                                val totalItems = listState.layoutInfo.totalItemsCount
+                                lastVisible >= totalItems - 3
+                            }
+                            .distinctUntilChanged()
+                            .filter { it }
+                            .collect {
+                                viewModel.loadMoreHistory()
                             }
                         }
                     }
